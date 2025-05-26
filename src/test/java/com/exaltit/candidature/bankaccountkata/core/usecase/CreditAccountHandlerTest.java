@@ -26,7 +26,7 @@ class CreditAccountHandlerTest {
 
     @Test
     void should_throw_exception_when_account_does_not_exist() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 100L));
+        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 100L));
         assertThrows(
                 BankAccountNotFoundException.class,
                 () -> {
@@ -39,12 +39,12 @@ class CreditAccountHandlerTest {
 
     @Test
     void should_credit_amount() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0));
+        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 0));
 
         handler.execute(new Command(ACCOUNT_NUMBER, 100L));
 
         BankAccount actual = accountRepository.byNumber(ACCOUNT_NUMBER).orElseThrow();
-        assertThat(actual).isEqualTo(new BankAccount(ACCOUNT_NUMBER, 100L));
+        assertThat(actual).isEqualTo(new BankAccount(ACCOUNT_NUMBER, 0, 100L));
     }
 
 }

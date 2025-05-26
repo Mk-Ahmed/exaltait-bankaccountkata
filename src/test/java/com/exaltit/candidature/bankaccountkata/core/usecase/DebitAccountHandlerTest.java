@@ -28,7 +28,7 @@ class DebitAccountHandlerTest {
 
     @Test
     void should_throw_exception_when_account_does_not_exist() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 100L));
+        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 100L));
         assertThrows(
                 BankAccountNotFoundException.class,
                 () -> {
@@ -40,7 +40,7 @@ class DebitAccountHandlerTest {
 
     @Test
     void should_thrown_exception_when_insufficient_funds() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 10));
+        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 10));
         assertThrows(
                 InsufficientFundsException.class,
                 () -> {
@@ -51,13 +51,23 @@ class DebitAccountHandlerTest {
     }
 
     @Test
-    void should_debit_amount() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 100L));
+    void should_debit_amount_when_sufficient_funds_available() {
+        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 100L));
 
         handler.execute(new Command(ACCOUNT_NUMBER, 100L));
 
         BankAccount actual = accountRepository.byNumber(ACCOUNT_NUMBER).orElseThrow();
-        assertThat(actual).isEqualTo(new BankAccount(ACCOUNT_NUMBER, 0));
+        assertThat(actual).isEqualTo(new BankAccount(ACCOUNT_NUMBER, 0, 0));
+    }
+
+    @Test
+    void should_debit_amount_when_balance_plus_overdraft_covers_amount() {
+        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 10, 100L));
+
+        handler.execute(new Command(ACCOUNT_NUMBER, 110L));
+
+        BankAccount actual = accountRepository.byNumber(ACCOUNT_NUMBER).orElseThrow();
+        assertThat(actual).isEqualTo(new BankAccount(ACCOUNT_NUMBER, 10, -10));
     }
 
 }
