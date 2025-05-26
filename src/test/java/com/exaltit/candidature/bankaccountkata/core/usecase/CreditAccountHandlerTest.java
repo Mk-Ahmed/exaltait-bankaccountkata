@@ -1,7 +1,10 @@
 package com.exaltit.candidature.bankaccountkata.core.usecase;
 
-import com.exaltit.candidature.bankaccountkata.core.model.BankAccount;
+import com.exaltit.candidature.bankaccountkata.core.model.Account;
+import com.exaltit.candidature.bankaccountkata.core.model.AccountLimitReachedException;
 import com.exaltit.candidature.bankaccountkata.core.model.BankAccountNotFoundException;
+import com.exaltit.candidature.bankaccountkata.core.model.CurrentAccount;
+import com.exaltit.candidature.bankaccountkata.core.model.SavingAccount;
 import com.exaltit.candidature.bankaccountkata.core.usecase.CreditAccountHandler.Command;
 import com.exaltit.candidature.bankaccountkata.secondaryadapters.InMemoryBankAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +29,7 @@ class CreditAccountHandlerTest {
 
     @Test
     void should_throw_exception_when_account_does_not_exist() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 100L));
+        accountRepository.save(new CurrentAccount(ACCOUNT_NUMBER, 0, 100L));
         assertThrows(
                 BankAccountNotFoundException.class,
                 () -> {
@@ -36,15 +39,25 @@ class CreditAccountHandlerTest {
         );
     }
 
-
     @Test
     void should_credit_amount() {
-        accountRepository.save(new BankAccount(ACCOUNT_NUMBER, 0, 0));
+        accountRepository.save(new CurrentAccount(ACCOUNT_NUMBER, 0, 0));
 
         handler.execute(new Command(ACCOUNT_NUMBER, 100L));
 
-        BankAccount actual = accountRepository.byNumber(ACCOUNT_NUMBER).orElseThrow();
-        assertThat(actual).isEqualTo(new BankAccount(ACCOUNT_NUMBER, 0, 100L));
+        Account actual = accountRepository.byNumber(ACCOUNT_NUMBER).orElseThrow();
+        assertThat(actual).isEqualTo(new CurrentAccount(ACCOUNT_NUMBER, 0, 100L));
     }
 
+    @Test
+    void should_throw_exception_when_account_limit_reached() {
+        accountRepository.save(new SavingAccount(ACCOUNT_NUMBER, 1000, 100L));
+        assertThrows(
+                AccountLimitReachedException.class,
+                () -> {
+                    Command command = new Command(ACCOUNT_NUMBER, 901);
+                    handler.execute(command);
+                }
+        );
+    }
 }

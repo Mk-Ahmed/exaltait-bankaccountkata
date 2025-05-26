@@ -1,14 +1,14 @@
 package com.exaltit.candidature.bankaccountkata.core.port;
 
-import com.exaltit.candidature.bankaccountkata.core.model.BankAccount;
+import com.exaltit.candidature.bankaccountkata.core.model.Account;
 
 import java.util.Optional;
 
 public interface BankAccountRepository {
 
 
-    Optional<BankAccount> byNumber(String accountNumber);
+    Optional<Account> byNumber(String accountNumber);
 
-    void save(BankAccount bankAccount);
+    void save(Account bankAccount);
 
 }
