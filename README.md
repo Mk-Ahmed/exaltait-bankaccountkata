@@ -9,7 +9,8 @@ Ce kata a été réalisé en respectant le niveau d’engagement 1.
 Pour représenter les types de comptes (compte courant et livret A), j’ai opté pour la création d’une interface Account,
 implémentée par deux classes : CurrentAccount et SavingAccount.
 
-Ce choix permet de :
+J'aurais pu laisser une seule classe Account, qui aurait pour etat le balanceLimit et le oberdraftLimit.
+J'ai prefere les distinguer de suite afin de:
 
 - Clarifier les règles métiers propres à chaque type de compte,
 - Préparer facilement l’ajout de nouveaux types de comptes à l’avenir,
