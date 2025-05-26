@@ -13,7 +13,12 @@ public class BankAccount {
     private long amount;
 
 
-    public void credit(long amount) {
-        this.amount += amount;
+    public void credit(long amountToCredit) {
+        amount += amountToCredit;
+    }
+
+    public void debit(long amountToDebit) {
+        if (amountToDebit > amount) throw new InsufficientFundsException();
+        amount -= amountToDebit;
     }
 }
